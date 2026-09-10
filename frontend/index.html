@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SatQuery AI — Multimodal Remote Sensing Assistant (SIH26167)</title>
+  <link rel="stylesheet" href="/static_ui/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation / Telemetry Bar -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="logo-badge">🛰️</div>
+      <div>
+        <h1 class="nav-title">SatQuery AI <span class="version-tag">v1.0-RC</span></h1>
+        <p class="nav-subtitle">Multimodal Vision-Language Remote Sensing Assistant | ISRO-SAC SIH26167</p>
+      </div>
+    </div>
+    <div class="nav-telemetry">
+      <div class="telemetry-pill" id="system-status">
+        <span class="pulse-dot"></span> System Online
+      </div>
+      <div class="telemetry-pill secondary" id="hw-pill">
+        ⚡ RTX 4050 / Local Engine
+      </div>
+      <div class="telemetry-pill model-pill" id="model-pill">
+        🎯 Siamese-ChangeNet & RS-VLM
+      </div>
+    </div>
+  </header>
+
+  <!-- 1-Click SIH Live Evaluation Presets Bar -->
+  <nav class="demo-showcase-bar">
+    <div class="demo-label">
+      <span class="radar-dot"></span>
+      <span>1-Click SIH Test Suites:</span>
+    </div>
+    <div class="demo-buttons" id="demo-buttons">
+      <button class="demo-btn" onclick="loadDemo('grounding')">
+        <span class="btn-icon">📍</span>
+        <span class="btn-text-main">VQA & Spatial Grounding</span>
+        <span class="btn-tag">Single Scene</span>
+      </button>
+      <button class="demo-btn" onclick="loadDemo('change')">
+        <span class="btn-icon">🔄</span>
+        <span class="btn-text-main">Bi-Temporal Change</span>
+        <span class="btn-tag">Siamese Diff</span>
+      </button>
+      <button class="demo-btn" onclick="loadDemo('optical_sar')">
+        <span class="btn-icon">⚡</span>
+        <span class="btn-text-main">Optical + SAR Fusion</span>
+        <span class="btn-tag">Cross-Modal</span>
+      </button>
+      <button class="demo-btn" onclick="loadDemo('captioning')">
+        <span class="btn-icon">📝</span>
+        <span class="btn-text-main">Scene Captioning</span>
+        <span class="btn-tag">VLM Synthesis</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Workstation Layout -->
+  <main class="dashboard-grid">
+    <!-- Left Panel: Input & Mission Parameters -->
+    <section class="panel control-panel">
+      <div class="panel-header">
+        <div class="header-with-icon">
+          <span class="panel-icon">⚙️</span>
+          <h2>Mission Parameters</h2>
+        </div>
+        <span class="step-badge">Step 1</span>
+      </div>
+
+      <!-- Upload Zone -->
+      <div class="upload-container" id="drop-zone">
+        <input type="file" id="file-input" multiple accept=".png,.jpg,.jpeg,.tif,.tiff" style="display: none;">
+        <div class="upload-prompt" id="upload-prompt">
+          <div class="upload-icon">📡</div>
+          <p class="upload-title">Drop Satellite Imagery Here</p>
+          <p class="upload-hint">Upload 1 image (Single VQA/Grounding) or 2 images (Bi-Temporal / Optical+SAR)</p>
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-input').click()">Browse Files</button>
+        </div>
+        <div class="file-previews" id="file-previews"></div>
+      </div>
+
+      <!-- Temporal / Sensor Metadata -->
+      <div class="form-group" id="temporal-group" style="display: none;">
+        <label for="timestamps-input">Timestamps (T1 Before, T2 After):</label>
+        <input type="text" id="timestamps-input" placeholder="e.g. 2023-01-15, 2024-01-15" class="input-text">
+      </div>
+
+      <!-- Natural Language Query Input -->
+      <div class="form-group">
+        <div class="label-row">
+          <label for="query-input">Query / Remote Sensing Instruction:</label>
+          <span class="query-hint-tag">Natural Language</span>
+        </div>
+        <textarea id="query-input" rows="3" class="input-textarea" placeholder="e.g. What changed between these observation dates? Or: Where are the water bodies?"></textarea>
+      </div>
+
+      <!-- Quick Preset Chips -->
+      <div class="presets-section">
+        <span class="presets-label">Suggested Queries:</span>
+        <div class="presets-container">
+          <span class="preset-chip" onclick="setQuery('Where are the water bodies located in this scene?')">📍 Locate Water</span>
+          <span class="preset-chip" onclick="setQuery('What changed between these observation dates?')">🔄 Detect Change</span>
+          <span class="preset-chip" onclick="setQuery('Perform joint Optical and SAR analysis to classify land cover.')">⚡ Optical + SAR</span>
+          <span class="preset-chip" onclick="setQuery('Describe the dominant terrain and infrastructure.')">📝 Caption Scene</span>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button id="analyze-btn" class="btn btn-primary btn-block">
+        <span id="btn-text">Execute SatQuery Orchestrator</span>
+        <div class="spinner" id="btn-spinner" style="display: none;"></div>
+      </button>
+    </section>
+
+    <!-- Center Panel: Visual Evidence Viewer -->
+    <section class="panel viewer-panel">
+      <div class="panel-header">
+        <div class="header-with-icon">
+          <span class="panel-icon">👁️</span>
+          <h2>Visual Evidence Verification</h2>
+        </div>
+        <div class="viewer-actions">
+          <span class="evidence-tag" id="evidence-tag">Standby</span>
+          <button class="btn btn-sm btn-glow" id="toggle-mask-btn" style="display: none;">🔥 Toggle Heatmap</button>
+        </div>
+      </div>
+
+      <div class="canvas-container" id="canvas-wrapper">
+        <div class="empty-state" id="empty-viewer">
+          <div class="empty-icon">🛰️</div>
+          <p class="empty-title">Awaiting Satellite Imagery</p>
+          <p class="empty-desc">Click any 1-Click Demo above or drop imagery on the left to begin analysis.</p>
+        </div>
+        
+        <!-- Standard Image / Bounding Box Canvas -->
+        <div class="image-wrapper" id="single-image-wrapper" style="display: none;">
+          <div class="image-inner-container">
+            <img id="main-display-img" src="" alt="Satellite View">
+            <div id="bbox-overlay"></div>
+          </div>
+        </div>
+
+        <!-- Before/After Split Comparison Slider -->
+        <div class="comparison-container" id="comparison-wrapper" style="display: none;">
+          <span class="view-tag tag-left">T1: Before</span>
+          <span class="view-tag tag-right" id="tag-after">T2: After</span>
+          <img id="img-before" src="" alt="Pre-Change Image">
+          <div class="img-after-wrapper" id="after-slider-wrapper">
+            <img id="img-after" src="" alt="Post-Change Image">
+          </div>
+          <input type="range" min="0" max="100" value="50" class="slider" id="compare-slider">
+          <div class="slider-line" id="slider-line">
+            <div class="slider-handle">↔</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Panel: Intelligence Answer & Auditable Trace -->
+    <section class="panel results-panel">
+      <div class="panel-header">
+        <div class="header-with-icon">
+          <span class="panel-icon">📊</span>
+          <h2>Executive Intelligence</h2>
+        </div>
+        <div class="confidence-badge" id="conf-badge">Waiting</div>
+      </div>
+
+      <!-- Telemetry HUD Grid -->
+      <div class="telemetry-hud" id="telemetry-hud">
+        <div class="hud-item">
+          <span class="hud-label">Confidence</span>
+          <span class="hud-val" id="hud-conf">--</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Latency</span>
+          <span class="hud-val" id="hud-time">--</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Task</span>
+          <span class="hud-val" id="hud-task">--</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Evidence</span>
+          <span class="hud-val" id="hud-evidence">--</span>
+        </div>
+      </div>
+
+      <!-- Answer Box -->
+      <div class="answer-card" id="answer-container">
+        <div class="answer-header">Analytical Assessment:</div>
+        <p class="placeholder-text">Submit an analysis or launch a live demo to inspect verified vision-language findings.</p>
+      </div>
+
+      <!-- Observable Trace Timeline -->
+      <div class="trace-section">
+        <div class="trace-header-row">
+          <h3>Observable Execution Trace</h3>
+          <span class="trace-badge">SIH Req E & F</span>
+        </div>
+        <div class="timeline" id="trace-timeline">
+          <div class="timeline-empty">Execution steps will be logged here with sub-millisecond precision.</div>
+        </div>
+      </div>
+
+      <!-- Export Report -->
+      <div class="export-footer">
+        <button id="download-report-btn" class="btn btn-secondary btn-block" disabled>
+          📄 Download Certified Mission Report (RFC 7946 GeoJSON)
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static_ui/app.js"></script>
+</body>
+</html>

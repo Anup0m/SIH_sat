@@ -1,0 +1,35 @@
+# SatQuery AI — Bi-Temporal Change Detection Model Configuration (Phase 3 & 4)
+# Trains Siamese Difference Network on Bi-Temporal image pairs to output binary change masks.
+
+experiment_name: "satquery_siamese_change_detector"
+
+# Model Architecture
+model:
+  backbone: "resnet34"                          # Lightweight, robust dual-branch feature extractor
+  pretrained: true
+  num_classes: 1                                # Binary change probability per pixel
+  in_channels: 3                                # RGB per temporal acquisition
+
+# Data Configuration
+data:
+  dataset_name: "CDVQA / SECOND Change Pairs"
+  image_size: [512, 512]
+  val_split_ratio: 0.15
+
+# Training Hyperparameters
+training:
+  batch_size: 4
+  learning_rate: 3.0e-4
+  max_epochs: 25
+  optimizer: "AdamW"
+  weight_decay: 1.0e-4
+  loss: "bce_dice_combined"                     # 0.5 * BCE + 0.5 * Dice (handles class imbalance)
+  dice_smooth: 1.0
+  mixed_precision: "fp16"
+
+# Checkpointing & Resilience
+checkpoints:
+  output_dir: "checkpoints/change_detector"
+  save_best_metric: "val_f1_score"
+  save_frequency_epochs: 1
+  resume_from_checkpoint: null

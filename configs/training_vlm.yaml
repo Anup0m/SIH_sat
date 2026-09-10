@@ -1,0 +1,48 @@
+# SatQuery AI — Remote Sensing Vision-Language Adaptation Configuration (Phase 3 & 4)
+# Adapts VLM on BigEarthNet.txt instructions using Low-Rank Adaptation (LoRA).
+
+experiment_name: "satquery_vlm_bigearthnet_lora"
+
+# Model Selection
+model:
+  base_model_name: "Qwen/Qwen2-VL-2B-Instruct"  # Lightweight, high-accuracy RS vision-language foundation
+  torch_dtype: "bfloat16"
+  use_flash_attention: false                     # Disabled for maximum compatibility across lab GPUs
+
+# Parameter-Efficient Fine-Tuning (LoRA)
+lora:
+  r: 16                                         # Rank
+  lora_alpha: 32                                # Alpha scaling
+  lora_dropout: 0.05
+  target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# Data Configuration
+data:
+  dataset_name: "BigEarthNet.txt"
+  train_parquet: "data/raw/bigearthnet/BigEarthNet.txt.parquet"
+  sample_parquet: "data/samples/bigearthnet/sample_500.parquet"
+  max_seq_length: 512
+  image_resolution: [512, 512]
+  val_split_ratio: 0.1
+
+# Optimization & Hyperparameters (Tuned for RTX 4050 6GB or College Lab 16GB)
+training:
+  batch_size: 2
+  gradient_accumulation_steps: 8               # Effective batch size = 16
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  warmup_ratio: 0.05
+  lr_scheduler_type: "cosine"
+  max_epochs: 3
+  mixed_precision: "fp16"
+  logging_steps: 10
+  save_strategy: "steps"
+  save_steps: 100
+  save_total_limit: 3
+
+# Checkpointing & Lab Resilience
+checkpoints:
+  output_dir: "checkpoints/vlm_adapted"
+  resume_from_checkpoint: null                  # Set to checkpoint path to resume interrupted lab training

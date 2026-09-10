@@ -1,0 +1,26 @@
+# SatQuery AI — Spatial Grounding Head Configuration (Phase 3 & 4)
+# Fine-tunes bounding box predictor on VRSBench referring expressions.
+
+experiment_name: "satquery_grounding_head"
+
+model:
+  vision_backbone: "clip-vit-base-patch32"
+  box_head: "mlp_regressor"                    # 3-layer MLP predicting [ymin, xmin, ymax, xmax]
+  hidden_dim: 256
+
+data:
+  dataset_name: "VRSBench Referring Expressions"
+  annotations_file: "data/raw/vrsbench/VRSBench_EVAL_referring.json"
+  target_format: "normalized_boxes_0_to_1"
+
+training:
+  batch_size: 8
+  learning_rate: 1.0e-4
+  max_epochs: 15
+  loss: "giou_and_l1"                          # Generalized IoU + L1 Loss
+  weight_giou: 2.0
+  weight_l1: 5.0
+
+checkpoints:
+  output_dir: "checkpoints/grounding_head"
+  resume_from_checkpoint: null

@@ -1,0 +1,58 @@
+# SatQuery AI — Official Specialist Model Registry
+# This file defines all available vision-language and spatial tools for the agent.
+
+registry_version: "1.0.0"
+
+specialists:
+  # 1. Vision-Language Specialist (VQA, Captioning, Cross-Modal queries)
+  vlm_specialist:
+    name: "Remote Sensing Vision-Language Assistant"
+    version: "1.0"
+    tasks:
+      - "vqa"
+      - "captioning"
+      - "cross_modal_analysis"
+    supported_modalities:
+      - "optical"
+      - "sar"
+      - "multimodal_pair"
+    input_format:
+      images: 1 or 2
+      prompt: "string"
+    output_type: "text_with_confidence"
+    description: "Interprets optical and SAR satellite imagery to answer natural language questions and describe scenes."
+    is_mock: true
+
+  # 2. Spatial Grounding Specialist (Object localization & Bounding Box)
+  grounding_specialist:
+    name: "Text-Guided Spatial Grounding Specialist"
+    version: "1.0"
+    tasks:
+      - "grounding"
+      - "localization"
+    supported_modalities:
+      - "optical"
+    input_format:
+      images: 1
+      target_expression: "string"
+    output_type: "bounding_boxes"
+    description: "Detects objects referenced in the query and returns normalized [ymin, xmin, ymax, xmax] bounding boxes."
+    is_mock: true
+
+  # 3. Bi-Temporal Change Specialist (Change detection and change mapping)
+  change_specialist:
+    name: "Bi-Temporal Remote Sensing Change Specialist"
+    version: "1.0"
+    tasks:
+      - "change_detection"
+      - "change_description"
+      - "change_vqa"
+    supported_modalities:
+      - "bitemporal_pair"
+    input_format:
+      images: 2
+      timestamps: ["T1", "T2"]
+      prompt: "optional string"
+    output_type: "change_mask_and_summary"
+    description: "Analyzes two spatially aligned satellite images of different dates to identify changes and generate difference maps."
+    is_mock: true
