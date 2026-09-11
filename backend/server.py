@@ -234,51 +234,82 @@ def get_test_dataset():
                 "sample_query": "Where are the low-elevation drainage basins and shadows located?"
             },
             {
-                "filename": "landcover_aerial_orthophoto.tif",
-                "path": "/test_dataset/geotiff/landcover_aerial_orthophoto.tif",
-                "sensor": "LandCover.ai Aerial Orthophoto GeoTIFF (.tif)",
-                "features": "High-resolution civil structures, rooftops, and access roads",
-                "sample_query": "Detect urban buildings and civil infrastructure in this orthophoto."
+                "filename": "sentinel2_minsk_urban.tif",
+                "path": "/test_dataset/geotiff/sentinel2_minsk_urban.tif",
+                "sensor": "Sentinel-2 Multispectral Urban GeoTIFF (.tif)",
+                "features": "Metropolitan urban fabric, street grid, and water reservoir",
+                "sample_query": "Locate urban buildings and water bodies in this GeoTIFF."
+            },
+            {
+                "filename": "sentinel2_congo_rainforest.tif",
+                "path": "/test_dataset/geotiff/sentinel2_congo_rainforest.tif",
+                "sensor": "Sentinel-2 Multispectral Forest GeoTIFF (.tif)",
+                "features": "Dense rainforest vegetation canopy, river clearing, and green canopy",
+                "sample_query": "Where are the dense forest zones and waterways?"
+            },
+            {
+                "filename": "sentinel2_bahamas_ocean_water.tif",
+                "path": "/test_dataset/geotiff/sentinel2_bahamas_ocean_water.tif",
+                "sensor": "Sentinel-2 Coastal Marine GeoTIFF (.tif)",
+                "features": "Shallow tropical ocean water, coral channels, deep water boundary",
+                "sample_query": "Locate and map all water bodies in this GeoTIFF."
+            },
+            {
+                "filename": "sentinel2_south_georgia_coast.tif",
+                "path": "/test_dataset/geotiff/sentinel2_south_georgia_coast.tif",
+                "sensor": "Sentinel-2 Coastal GeoTIFF (.tif)",
+                "features": "Deep marine ocean water, coastline, and rugged topography",
+                "sample_query": "Where is the water coastline located?"
             }
         ],
         "sar": [
             {
-                "filename": "sar_sentinel1_dual_polarization.jpg",
-                "path": "/test_dataset/sar/sar_sentinel1_dual_polarization.jpg",
-                "sensor": "Sentinel-1 SAR C-Band Microwave",
-                "features": "Dual-polarization radar backscatter (specular water, double bounce)",
-                "sample_query": "Analyze water boundaries using radar backscatter."
+                "filename": "sentinel1_sar_dual_polarization.tif",
+                "path": "/test_dataset/sar/sentinel1_sar_dual_polarization.tif",
+                "sensor": "Sentinel-1 SAR C-Band Dual-Polarization GeoTIFF (.tif)",
+                "features": "High-resolution radar backscatter (specular water, double-bounce urban)",
+                "sample_query": "Analyze radar backscatter to identify water bodies and urban structures."
             },
             {
-                "filename": "sentinel1_sar_vh.tif",
-                "path": "/test_dataset/sar/sentinel1_sar_vh.tif",
-                "sensor": "Sentinel-1 SAR VH GeoTIFF (.tif)",
-                "features": "Cross-polarization volume scattering radar patch",
-                "sample_query": "Perform radar backscatter and water detection."
-            },
-            {
-                "filename": "sentinel1_sar_vv.tif",
-                "path": "/test_dataset/sar/sentinel1_sar_vv.tif",
-                "sensor": "Sentinel-1 SAR VV GeoTIFF (.tif)",
-                "features": "Co-polarization surface roughness radar patch",
-                "sample_query": "Analyze surface roughness and radar intensity."
-            },
-            {
-                "filename": "sentinel1_sar_hh_polarization.tif",
-                "path": "/test_dataset/sar/sentinel1_sar_hh_polarization.tif",
-                "sensor": "Sentinel-1 SAR HH Polarization GeoTIFF (.tif)",
-                "features": "Horizontal co-polarized microwave backscatter calibrated intensity",
+                "filename": "sentinel1_sar_coastal_radar.tif",
+                "path": "/test_dataset/sar/sentinel1_sar_coastal_radar.tif",
+                "sensor": "Sentinel-1 SAR Coastal Radar GeoTIFF (.tif)",
+                "features": "C-Band SAR radar coastal boundary and calm water detection",
                 "sample_query": "Evaluate radar backscatter intensity and identify low-return water zones."
             },
             {
-                "filename": "sentinel1_sar_hv_polarization.tif",
-                "path": "/test_dataset/sar/sentinel1_sar_hv_polarization.tif",
-                "sensor": "Sentinel-1 SAR HV Polarization GeoTIFF (.tif)",
-                "features": "Horizontal-Vertical cross-polarized volume scattering radar patch",
-                "sample_query": "Analyze microwave cross-polarization and surface textures."
+                "filename": "sentinel1_sar_agricultural_radar.tif",
+                "path": "/test_dataset/sar/sentinel1_sar_agricultural_radar.tif",
+                "sensor": "Sentinel-1 SAR Agricultural Radar GeoTIFF (.tif)",
+                "features": "C-Band SAR radar soil moisture and crop surface roughness",
+                "sample_query": "Analyze surface roughness and radar intensity across agricultural plots."
+            },
+            {
+                "filename": "sar_sentinel1_dual_polarization.jpg",
+                "path": "/test_dataset/sar/sar_sentinel1_dual_polarization.jpg",
+                "sensor": "Sentinel-1 SAR C-Band Microwave (Full Composite)",
+                "features": "Dual-polarization radar backscatter (specular water, double bounce)",
+                "sample_query": "Analyze water boundaries using radar backscatter."
             }
         ]
     }
+
+
+@app.get("/api/download_test_dataset")
+def download_test_dataset():
+    """Downloads the complete curated satellite test dataset as a ZIP archive."""
+    zip_path = TEST_DATASET_DIR / "Satellite_Test_Images.zip"
+    if not zip_path.exists():
+        alt_zip = Path(r"C:\Users\Yash\Desktop\Satellite_Test_Images.zip")
+        if alt_zip.exists():
+            shutil.copy2(alt_zip, zip_path)
+    if zip_path.exists():
+        return FileResponse(
+            path=str(zip_path),
+            filename="Satellite_Test_Images.zip",
+            media_type="application/zip"
+        )
+    raise HTTPException(status_code=404, detail="Test dataset zip not found.")
 
 
 @app.post("/api/analyze", response_model=AnalysisResult)

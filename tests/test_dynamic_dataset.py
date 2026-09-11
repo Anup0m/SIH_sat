@@ -24,9 +24,9 @@ def test_dynamic_execution():
         ("data/test_dataset/geotiff/landsat_rgb.tif", "Locate water bodies in this GeoTIFF."),
         ("data/test_dataset/geotiff/landsat_multispectral_urban.tif", "Map the water bodies in this Landsat GeoTIFF."),
         ("data/test_dataset/geotiff/global_earth_observation.tif", "Where are the water bodies located?"),
-        ("data/test_dataset/geotiff/landcover_aerial_orthophoto.tif", "Locate the urban structures and buildings."),
+        ("data/test_dataset/geotiff/sentinel2_congo_rainforest.tif", "Where are the dense forest zones and green vegetation canopy?"),
         ("data/test_dataset/geotiff/sentinel2_cloud_optimized_cog.tif", "What is the dominant land cover in this GeoTIFF?"),
-        ("data/test_dataset/sar/sentinel1_sar_hh_polarization.tif", "Perform radar backscatter and water detection."),
+        ("data/test_dataset/sar/sentinel1_sar_dual_polarization.tif", "Perform radar backscatter and water detection."),
         ("data/test_dataset/sar/sar_sentinel1_dual_polarization.jpg", "Analyze water boundaries using radar backscatter.")
     ]
 
