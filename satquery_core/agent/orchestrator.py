@@ -37,7 +37,12 @@ class SatQueryAgent:
         self.parser = QueryParser()
         
         # Specialist registry (dynamically loads real models if checkpoints exist)
-        change_ckpt = Path(__file__).resolve().parent.parent.parent / "checkpoints" / "change_detector" / "best_change_model.pt"
+        checkpoints_dir = Path(__file__).resolve().parent.parent.parent / "checkpoints"
+        change_ckpt = checkpoints_dir / "change_detector" / "best_change_model.pt"
+        grounding_ckpt = checkpoints_dir / "grounding_head" / "best_grounding_model.pt"
+        vlm_ckpt = checkpoints_dir / "vlm_adapted" / "latest_checkpoint.pt"
+
+        # 1. Change Specialist
         if change_ckpt.exists():
             try:
                 from satquery_core.models.real_specialists import RealChangeSpecialist
@@ -47,9 +52,26 @@ class SatQueryAgent:
         else:
             change_spec = MockChangeSpecialist()
 
+        # 2. Grounding Specialist
+        if grounding_ckpt.exists():
+            try:
+                from satquery_core.models.real_specialists import RealGroundingSpecialist
+                grounding_spec = RealGroundingSpecialist(str(grounding_ckpt))
+            except Exception:
+                grounding_spec = MockGroundingSpecialist()
+        else:
+            grounding_spec = MockGroundingSpecialist()
+
+        # 3. VLM Specialist
+        try:
+            from satquery_core.models.real_specialists import RealVLMSpecialist
+            vlm_spec = RealVLMSpecialist(str(vlm_ckpt) if vlm_ckpt.exists() else None)
+        except Exception:
+            vlm_spec = MockVLMSpecialist()
+
         self.specialists: Dict[str, BaseSpecialist] = {
-            "vlm_specialist": MockVLMSpecialist(),
-            "grounding_specialist": MockGroundingSpecialist(),
+            "vlm_specialist": vlm_spec,
+            "grounding_specialist": grounding_spec,
             "change_specialist": change_spec
         }
 
@@ -103,6 +125,7 @@ class SatQueryAgent:
         # STEP 3 & 4: Specialist Execution
         # -------------------------------------------------------------
         answers = []
+        layman_solutions = []
         combined_evidence = VisualEvidence()
         confidence_scores = []
 
@@ -118,6 +141,8 @@ class SatQueryAgent:
             t_dur = (time.time() - t_start) * 1000.0
 
             answers.append(out.answer)
+            if getattr(out, "plain_language_solution", None):
+                layman_solutions.append(out.plain_language_solution)
             confidence_scores.append(out.confidence_score)
 
             # Merge evidence if produced
@@ -137,7 +162,18 @@ class SatQueryAgent:
         # -------------------------------------------------------------
         # STEP 5: Confidence & Result Aggregation
         # -------------------------------------------------------------
-        final_answer = " ".join(answers)
+        unique_answers = []
+        for a in answers:
+            if a and a not in unique_answers:
+                unique_answers.append(a)
+        final_answer = "\n\n".join(unique_answers) if unique_answers else "Analysis complete."
+
+        unique_layman = []
+        for l in layman_solutions:
+            if l and l not in unique_layman:
+                unique_layman.append(l)
+        final_layman = " ".join(unique_layman) if unique_layman else None
+
         avg_confidence = float(sum(confidence_scores) / len(confidence_scores)) if confidence_scores else 0.85
         
         conf_level = "High" if avg_confidence >= 0.85 else ("Moderate" if avg_confidence >= 0.65 else "Low")
@@ -154,6 +190,7 @@ class SatQueryAgent:
         return AnalysisResult(
             query=request.query,
             answer=final_answer,
+            plain_language_solution=final_layman,
             evidence=combined_evidence,
             confidence_score=round(avg_confidence, 2),
             confidence_level=conf_level,

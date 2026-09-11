@@ -54,19 +54,25 @@ class MissionReportGenerator:
 
 ---
 
-## 2. Executive Intelligence Summary
+## 2. Query Solution (Plain Language / Layman's Summary)
+> **Direct Non-Technical Answer**:  
+> {result.plain_language_solution or 'Direct ground feature evaluation complete.'}
+
+---
+
+## 3. Technical Intelligence & Detailed Analytics
 {result.answer}
 
 * **Confidence Assessment**: **{result.confidence_level}** ({result.confidence_score * 100:.1f}%)
 
 ---
 
-## 3. Visual & Spatial Evidence
+## 4. Visual & Spatial Evidence
 {evidence_section}
 
 ---
 
-## 4. Auditable Execution Trace (SIH Requirement E & F)
+## 5. Auditable Execution Trace (SIH Requirement E & F)
 | Step | Action | Description | Output Summary |
 | :---: | :--- | :--- | :--- |
 {trace_table}

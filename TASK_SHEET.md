@@ -17,11 +17,11 @@ It serves as the definitive engineering checklist ensuring complete compliance w
 | **Phase 6** | Build The Entire Web Frontend | Local CPU | **COMPLETED [x]** | Responsive UI, Evidence Viewer, Swipe Slider |
 | **Phase 7** | System Integration with Mock Specialists | Local CPU | **COMPLETED [x]** | End-to-end API-Agent-Frontend wiring |
 | **Phase 8** | Local Offline Full-System Testing | Local CPU | **COMPLETED [x]** | `tests/test_full_system.py` passed 100% |
-| **Phase 9** | College Lab GPU Heavy Training | Lab / Cloud GPU | **PROVISIONED [x]** | `launcher.py`, `setup_lab_gpu.sh`, Colab notebook |
-| **Phase 10** | Bring Trained Models Back & Swap Mocks | Local RTX 4050 | **COMPLETED [x]** | Dynamic real checkpoint loader verified live |
+| **Phase 9** | College Lab / Cloud GPU Heavy Training | Cloud T4 GPU | **COMPLETED [x]** | Full 25-epoch ChangeNet & 3-epoch VLM checkpoints |
+| **Phase 10** | Bring Trained Models Back & Swap Mocks | Local RTX 4050 | **COMPLETED [x]** | Checkpoints extracted & active in `checkpoints/` |
 | **Phase 11** | Model-Dependent Tuning & Calibration | Local RTX 4050 | **COMPLETED [x]** | Adaptive thresholding, RFC 7946 GeoJSON export |
 | **Phase 12** | Final End-to-End Real Model Verification | Local RTX 4050 | **COMPLETED [x]** | Real inferences with live evidence & trace verified |
-| **Phase 13** | Benchmark Reporting & Demo Packaging | Local / Lab | **COMPLETED [x]** | `run_satquery.py`, evaluation suite, README |
+| **Phase 13** | Benchmark Reporting & Demo Packaging | Local / Lab | **COMPLETED [x]** | Turnkey 1-Click UI, full test suite 100% passed |
 
 ---
 

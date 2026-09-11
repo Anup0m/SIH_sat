@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>SatQuery AI | Analysis</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+
+<body class="page-slide-in">
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <button id="backButton" class="back-button">
+            ← Back
+        </button>
+
+        <div class="logo">
+            🛰️ SATQUERY
+        </div>
+
+        <div class="nav-spacer" style="width: 80px;" aria-hidden="true"></div>
+
+    </nav>
+
+
+    <!-- DASHBOARD — single-column stacked layout -->
+
+    <main class="dashboard">
+
+
+        <!-- ROW 1: MISSION PARAMETERS (above image) -->
+
+        <section class="panel mission-panel">
+
+            <p class="panel-label">
+                MISSION PARAMETERS
+            </p>
+
+            <div class="mission-grid">
+
+                <!-- Query box -->
+                <div class="mission-query">
+                    <h2>User Query</h2>
+                    <div id="queryDisplay" class="query-box">
+                        Loading query...
+                    </div>
+                </div>
+
+                <!-- Parameters strip -->
+                <div class="mission-params">
+
+                    <div class="parameter">
+                        <span>INPUT TYPE</span>
+                        <strong id="inputType">Satellite Imagery</strong>
+                    </div>
+
+                    <div class="parameter">
+                        <span>TASK</span>
+                        <strong id="taskType">Detecting...</strong>
+                    </div>
+
+                    <div class="parameter">
+                        <span>MODEL</span>
+                        <strong id="modelName">Selecting...</strong>
+                    </div>
+
+                    <div class="parameter">
+                        <span>STATUS</span>
+                        <strong class="online">ANALYSIS READY</strong>
+                    </div>
+
+                </div>
+
+                <!-- File thumbnails (if image uploaded) -->
+                <div id="fileThumbnails" class="file-thumbnails"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ROW 2: VISUAL EVIDENCE (center — the image) -->
+
+        <section class="panel evidence-panel">
+
+            <div class="evidence-header">
+                <p class="panel-label">VISUAL EVIDENCE</p>
+                <h2>Satellite Analysis</h2>
+            </div>
+
+            <!-- Single image + bounding box canvas -->
+            <div
+                id="imageViewer"
+                class="image-viewer">
+
+                <div class="empty-viewer">
+
+                    <div class="satellite-icon">
+                        🛰️
+                    </div>
+
+                    <p>
+                        Waiting for satellite imagery
+                    </p>
+
+                </div>
+
+                <!-- Canvas overlay for bounding boxes -->
+                <canvas id="bboxCanvas" class="bbox-canvas" style="display:none;"></canvas>
+
+            </div>
+
+
+            <!-- Bi-temporal & Cross-modal split slider -->
+            <div id="splitSlider" class="split-slider" style="display:none;">
+                <div class="split-after" id="splitAfter"></div>
+                <div class="split-before" id="splitBefore"></div>
+                <span class="split-label split-label-left" id="splitLabelLeft">OPTICAL (SENTINEL-2)</span>
+                <span class="split-label split-label-right" id="splitLabelRight">SAR RADAR (SENTINEL-1)</span>
+                <div class="split-divider-line" id="splitDividerLine"></div>
+                <div class="split-handle" id="splitHandle">⇔</div>
+            </div>
+
+
+            <div class="viewer-controls">
+
+                <button id="heatmapButton">
+                    ◉ Evidence Overlay
+                </button>
+
+                <button id="resetButton">
+                    Reset
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ROW 3: EXECUTIVE INTELLIGENCE (below image) -->
+
+        <section class="panel intelligence-panel">
+
+            <p class="panel-label">
+                EXECUTIVE INTELLIGENCE
+            </p>
+
+            <!-- CONFIDENCE -->
+            <div class="confidence-card">
+                <span>
+                    CONFIDENCE
+                </span>
+                <strong id="confidence">
+                    --
+                </strong>
+            </div>
+
+            <!-- COLLAPSIBLE EVALUATION TRACE (CLAUDE-STYLE DROPDOWN) -->
+            <div class="trace-dropdown" id="traceDropdown">
+                <button type="button" class="trace-toggle-btn" id="traceToggle" aria-expanded="false" title="Click to inspect reasoning trace">
+                    <span class="trace-toggle-left">
+                        <span class="trace-sparkle">✦</span>
+                        <span class="trace-toggle-label">Evaluation Trace</span>
+                        <span class="trace-count-badge" id="traceCountBadge">4 steps</span>
+                    </span>
+                    <span class="trace-arrow-wrap">
+                        <span class="trace-hint">Click to inspect</span>
+                        <span class="trace-arrow" id="traceArrow">⌄</span>
+                    </span>
+                </button>
+                <div class="trace-dropdown-body" id="traceDropdownBody">
+                    <div id="trace" class="trace">
+                        <div class="trace-item">
+                            <div class="trace-item-header">
+                                <span class="trace-dot"></span>
+                                <span class="trace-step-title">Step 1: Input Validation</span>
+                            </div>
+                            <div class="trace-item-desc">Validated image presence, file formats, and spatial compatibility.</div>
+                            <div class="trace-item-output">Output: Status: PASSED - Verification successful.</div>
+                        </div>
+                        <div class="trace-item">
+                            <div class="trace-item-header">
+                                <span class="trace-dot"></span>
+                                <span class="trace-step-title">Step 2: Task Classification &amp; Workflow Planning</span>
+                            </div>
+                            <div class="trace-item-desc">Classified user intent and mapped workflow specialist pipeline.</div>
+                            <div class="trace-item-output">Output: Planned workflow: Specialist Pipeline Scheduled</div>
+                        </div>
+                        <div class="trace-item">
+                            <div class="trace-item-header">
+                                <span class="trace-dot"></span>
+                                <span class="trace-step-title">Step 3: Specialist Execution</span>
+                            </div>
+                            <div class="trace-item-desc">Executed deep spatial reasoning and feature extraction.</div>
+                            <div class="trace-item-output">Output: Specialist inference complete with calibrated confidence.</div>
+                        </div>
+                        <div class="trace-item">
+                            <div class="trace-item-header">
+                                <span class="trace-dot"></span>
+                                <span class="trace-step-title">Step 4: Result Aggregation</span>
+                            </div>
+                            <div class="trace-item-desc">Consolidated textual analysis, visual evidence, and calibrated overall confidence.</div>
+                            <div class="trace-item-output">Output: Final confidence calibrated. Evidence ready.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUERY SOLUTION (PLAIN LANGUAGE / LAYMAN'S VIEW) -->
+            <div class="layman-solution-card" id="laymanSolutionCard">
+                <div class="layman-card-header">
+                    <span class="layman-badge">
+                        <span class="layman-bulb">💡</span>
+                        <span>QUERY SOLUTION</span>
+                    </span>
+                    <span class="layman-tag">Plain Language / Non-Technical</span>
+                </div>
+                <div id="laymanAnswer" class="layman-text">
+                    Loading direct plain language answer...
+                </div>
+            </div>
+
+            <!-- ANSWER (TECHNICAL SATELLITE INTELLIGENCE) -->
+            <h2>
+                Technical Analysis &amp; Spatial Evidence
+            </h2>
+
+            <div
+                id="answer"
+                class="answer-card">
+                Running analysis...
+            </div>
+
+            <!-- TELEMETRY -->
+            <div class="telemetry">
+                <div>
+                    <span>LATENCY</span>
+                    <strong id="latency">--</strong>
+                </div>
+                <div>
+                    <span>WORKFLOW</span>
+                    <strong id="workflow">--</strong>
+                </div>
+                <div>
+                    <span>STATUS</span>
+                    <strong class="online">
+                        COMPLETE
+                    </strong>
+                </div>
+            </div>
+
+            <!-- REPORT -->
+            <button
+                id="downloadReport"
+                class="report-button">
+                ↓ Download Analysis Report
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <script src="output.js"></script>
+
+</body>
+
+</html>

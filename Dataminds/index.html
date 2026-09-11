@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SatQuery AI | Dataminds</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Satellite Map Behind Pure Black Aperture -->
+    <div class="satellite-map-bg" id="satelliteMapBg" aria-hidden="true"></div>
+
+    <!-- Circle Aperture with Thin Line of Light -->
+    <div class="magnifier-cursor" id="magnifierCursor" aria-hidden="true">
+        <div class="magnifier-ring"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🛰️</span>
+            <span>SATQUERY</span>
+        </div>
+    </nav>
+
+
+    <!-- Main Landing Page -->
+    <main class="hero">
+
+        <div class="hero-content">
+
+            <p class="eyebrow">
+                DATAMINDS • SATELLITE INTELLIGENCE
+            </p>
+
+            <h1>
+                Where should<br>
+                <span>we begin?</span>
+            </h1>
+
+            <p class="description">
+                Ask questions about satellite imagery using
+                AI-powered remote sensing analysis.
+            </p>
+
+
+            <!-- Query Form -->
+            <form id="queryForm">
+
+                <!-- Uploaded satellite image preview (positioned above text bar) -->
+                <div id="fileList" class="file-list"></div>
+
+                <div class="input-container">
+
+                    <!-- Attach -->
+                    <button
+                        type="button"
+                        class="icon-button"
+                        id="attachButton"
+                        title="Attach satellite image">
+                        +
+                    </button>
+
+                    <input
+                        type="file"
+                        id="fileInput"
+                        accept="image/*,.tif,.tiff"
+                        multiple
+                        hidden
+                    >
+
+                    <!-- Query -->
+                    <input
+                        type="text"
+                        id="queryInput"
+                        placeholder="Ask anything about your satellite image..."
+                        autocomplete="off"
+                    >
+
+                    <!-- Mic -->
+                    <button
+                        type="button"
+                        class="icon-button"
+                        id="micButton"
+                        title="Voice input">
+                        🎙
+                    </button>
+
+                    <!-- Submit -->
+                    <button
+                        type="submit"
+                        class="submit-button"
+                        title="Analyze">
+                        ➜
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer>
+        <span>DATAMINDS</span>
+        <span>•</span>
+        <span>SatQuery AI</span>
+        <span>•</span>
+        <span>SIH 2026</span>
+    </footer>
+
+
+    <!-- IMAGE LIGHTBOX MODAL (for viewing uploaded photo in full resolution) -->
+    <div id="imageLightbox" class="image-lightbox" style="display: none;">
+        <div class="lightbox-content">
+            <button id="lightboxClose" class="lightbox-close" title="Close preview">✕</button>
+            <img id="lightboxImg" src="" alt="Full size preview" class="lightbox-img">
+            <div id="lightboxCaption" class="lightbox-caption"></div>
+        </div>
+    </div>
+
+
+    <script src="hero.js"></script>
+
+</body>
+</html>

@@ -57,6 +57,19 @@ def train(config_path: str, dry_run: bool = False, resume: bool = False):
 
     # Load dataset
     parquet_path = BASE_DIR / (cfg["data"]["sample_parquet"] if dry_run else cfg["data"]["train_parquet"])
+    if not parquet_path.exists():
+        print(f"[*] Parquet file not found at {parquet_path}. Downloading from HuggingFace...")
+        import urllib.request
+        dest_dir = BASE_DIR / "data" / "raw" / "bigearthnet"
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        dest_file = dest_dir / "BigEarthNet.txt.parquet"
+        if not dest_file.exists():
+            url = "https://huggingface.co/datasets/BIFOLD-BigEarthNetv2-0/BigEarthNet.txt/resolve/main/BigEarthNet.txt.parquet"
+            print(f"    Downloading from {url}...")
+            urllib.request.urlretrieve(url, dest_file)
+            print("    [OK] Download complete!")
+        parquet_path = dest_file
+
     print(f"[*] Loading dataset from: {parquet_path}")
     dataset = BigEarthNetDataset(parquet_path=parquet_path, max_samples=10 if dry_run else None)
     print(f"[*] Total training samples: {len(dataset):,}")

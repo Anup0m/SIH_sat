@@ -13,11 +13,15 @@ data/raw/
 data/cleaned/
 data/uploads/
 data/reports/
+data/samples/output_masks/
 *.parquet
 *.zip
-*.tar.gz
 *.tif
 *.tiff
+!data/test_dataset/**/*.tif
+!data/test_dataset/**/*.tiff
+.cache/
+.pytest_cache/
 
 # Model checkpoints
 checkpoints/

@@ -41,6 +41,14 @@ class VisualEvidence(BaseModel):
         default=None,
         description="Path to generated binary or semantic change mask image"
     )
+    preview_path: Optional[str] = Field(
+        default=None,
+        description="Path to generated web-renderable PNG preview for GeoTIFF or raw formats"
+    )
+    preview_paths: Optional[List[str]] = Field(
+        default=None,
+        description="Web-renderable preview paths for multi-image inputs"
+    )
     spatial_metadata: Optional[Dict[str, Any]] = Field(
         default_factory=dict,
         description="Georeferencing metadata (CRS, bounds, ground resolution in meters)"
@@ -62,6 +70,10 @@ class AnalysisResult(BaseModel):
     """Final unified response returned by SatQuery AI."""
     query: str
     answer: str = Field(..., description="Clear textual response to the user's query")
+    plain_language_solution: Optional[str] = Field(
+        default=None,
+        description="Direct layman-friendly answer without complex technical jargon"
+    )
     evidence: VisualEvidence = Field(default_factory=VisualEvidence)
     confidence_score: float = Field(
         ..., 

@@ -18,8 +18,9 @@ class QueryParser:
         "between these dates", "over time", "before and after", "temporal"
     ]
     CROSS_MODAL_KEYWORDS = [
-        "sar", "radar", "optical and sar", "multispectral and radar", "penetrate clouds",
-        "all-weather", "joint analysis", "complementary"
+        "sar", "radar", "optical and sar", "optical + sar", "sar-optical", "sar + optical",
+        "multispectral and radar", "penetrate clouds", "all-weather", "joint analysis",
+        "complementary", "fusion", "cross-modal", "cross modal", "dielectric"
     ]
     CAPTION_KEYWORDS = [
         "describe", "caption", "overview", "summarize", "what does this image show",
@@ -33,29 +34,31 @@ class QueryParser:
         q = query.lower().strip()
         is_pair = (num_images == 2)
 
-        # Check for multi-step workflow: e.g. "what changed and where?"
-        wants_change = any(k in q for k in self.CHANGE_KEYWORDS) or is_pair
-        wants_grounding = any(k in q for k in self.GROUNDING_KEYWORDS)
         wants_cross_modal = any(k in q for k in self.CROSS_MODAL_KEYWORDS)
+        wants_change_explicit = any(k in q for k in self.CHANGE_KEYWORDS)
+        wants_grounding = any(k in q for k in self.GROUNDING_KEYWORDS)
         wants_caption = any(k in q for k in self.CAPTION_KEYWORDS)
 
-        if is_pair and wants_change and wants_grounding:
+        # 1. Optical + SAR Cross-Modal Fusion (highest precedence when SAR/radar/fusion is requested)
+        if wants_cross_modal:
+            return {
+                "primary_task": "optical_sar_fusion",
+                "is_multistep": False,
+                "workflow": ["vlm_specialist"],
+                "reasoning": "Query requires joint optical and SAR cross-modal analysis on multimodal sensor imagery."
+            }
+
+        # 2. Multi-step change + grounding (e.g. "what changed and locate the new buildings")
+        if is_pair and wants_change_explicit and wants_grounding:
             return {
                 "primary_task": "change_detection",
                 "is_multistep": True,
-                "workflow": ["change_detection", "grounding"],
+                "workflow": ["change_specialist", "grounding_specialist"],
                 "reasoning": "Query asks for both change analysis and spatial localization on a bi-temporal pair."
             }
 
-        if is_pair and wants_cross_modal:
-            return {
-                "primary_task": "cross_modal_analysis",
-                "is_multistep": False,
-                "workflow": ["vlm_specialist"],
-                "reasoning": "Query requires joint optical and SAR analysis on co-registered pair."
-            }
-
-        if is_pair and wants_change:
+        # 3. Bi-temporal change detection
+        if is_pair and (wants_change_explicit or not (wants_grounding or wants_caption)):
             return {
                 "primary_task": "change_detection",
                 "is_multistep": False,

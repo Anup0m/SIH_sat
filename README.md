@@ -57,10 +57,11 @@ The workstation will automatically open in your browser at:
 │   └── reporting/             # Certified analytical mission report generator
 ├── backend/                   # FastAPI REST backend server
 │   └── server.py              # Endpoints: /api/analyze, /api/validate, /api/models, /api/health
-├── frontend/                  # Interactive Command Center Dashboard
-│   ├── index.html             # High-tech dark UI with split-screen change slider
-│   ├── styles.css             # Cyber/defense command styling
-│   └── app.js                 # Drag-and-drop, canvas bounding boxes, live trace
+├── Dataminds/                 # Modern SatQuery AI Web Dashboard & Analysis Interface
+│   ├── index.html             # High-tech landing page with turnkey demo launcher & voice input
+│   ├── output.html            # Analysis workstation with split slider, evaluation trace & report
+│   ├── hero.js & output.js    # Interactive controls, bounding boxes, and observable pipeline
+│   └── styles.css             # Polished dark command center theme styling
 ├── training/                  # Uncompromising lab training pipelines (Phases 4 & 9)
 │   ├── train_vlm.py           # VLM fine-tuning on BigEarthNet.txt with LoRA & checkpoints
 │   ├── train_change.py        # Siamese change detection training with BCE + Dice

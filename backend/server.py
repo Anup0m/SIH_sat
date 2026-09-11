@@ -56,10 +56,15 @@ STATIC_DIR.mkdir(parents=True, exist_ok=True)
 DEMO_DIR = BASE_DIR / "data" / "demo_samples"
 DEMO_DIR.mkdir(parents=True, exist_ok=True)
 
-FRONTEND_DIR = BASE_DIR / "frontend"
+TEST_DATASET_DIR = BASE_DIR / "data" / "test_dataset"
+TEST_DATASET_DIR.mkdir(parents=True, exist_ok=True)
+
+FRONTEND_DIR = BASE_DIR / "Dataminds"
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 app.mount("/demo_samples", StaticFiles(directory=str(DEMO_DIR)), name="demo_samples")
+app.mount("/test_dataset", StaticFiles(directory=str(TEST_DATASET_DIR)), name="test_dataset")
 app.mount("/static_ui", StaticFiles(directory=str(FRONTEND_DIR)), name="static_ui")
 
 # Instantiate Agent
@@ -68,8 +73,14 @@ agent = SatQueryAgent()
 
 @app.get("/")
 def serve_ui():
-    """Serves the SatQuery AI Interactive Web Dashboard."""
+    """Serves the SatQuery AI Landing Page."""
     return FileResponse(FRONTEND_DIR / "index.html")
+
+
+@app.get("/output.html")
+def serve_output_page():
+    """Serves the SatQuery AI Analysis Dashboard."""
+    return FileResponse(FRONTEND_DIR / "output.html")
 
 
 @app.get("/api/health")
@@ -145,6 +156,131 @@ def get_demo_cases():
     ]
 
 
+@app.get("/api/test_dataset")
+def get_test_dataset():
+    """Returns curated testing dataset catalog with sample queries for laptops."""
+    return {
+        "optical": [
+            {
+                "filename": "optical_sentinel2_bahamas_water.jpg",
+                "path": "/test_dataset/optical/optical_sentinel2_bahamas_water.jpg",
+                "sensor": "Sentinel-2 True Color (VNIR)",
+                "features": "Shallow tropical ocean water, coral channels, deep water boundary",
+                "sample_query": "Locate and map all water bodies in this scene."
+            },
+            {
+                "filename": "optical_sentinel2_congo_forest.jpg",
+                "path": "/test_dataset/optical/optical_sentinel2_congo_forest.jpg",
+                "sensor": "Sentinel-2 True Color (VNIR)",
+                "features": "Dense tropical rainforest canopy and river clearings",
+                "sample_query": "Where are the green vegetation and forest zones?"
+            },
+            {
+                "filename": "optical_sentinel2_minsk_urban.jpg",
+                "path": "/test_dataset/optical/optical_sentinel2_minsk_urban.jpg",
+                "sensor": "Sentinel-2 True Color (VNIR)",
+                "features": "Metropolitan urban fabric, road network, and water reservoir",
+                "sample_query": "Locate the water bodies and urban areas."
+            },
+            {
+                "filename": "optical_sentinel2_south_georgia_coastal.jpg",
+                "path": "/test_dataset/optical/optical_sentinel2_south_georgia_coastal.jpg",
+                "sensor": "Sentinel-2 True Color (VNIR)",
+                "features": "Deep marine ocean water, coastal boundary, rugged topography",
+                "sample_query": "Where is the water coastline located?"
+            }
+        ],
+        "geotiff": [
+            {
+                "filename": "landsat_rgb.tif",
+                "path": "/test_dataset/geotiff/landsat_rgb.tif",
+                "sensor": "Landsat-8 Multispectral GeoTIFF (.tif)",
+                "features": "Coastal estuary, sediment plumes, and land cover",
+                "sample_query": "Locate water bodies in this GeoTIFF."
+            },
+            {
+                "filename": "landsat_multispectral_urban.tif",
+                "path": "/test_dataset/geotiff/landsat_multispectral_urban.tif",
+                "sensor": "Landsat-8 True-Color 3-Band GeoTIFF (.tif)",
+                "features": "Coastal wetlands, ocean water boundary, and urban fringe",
+                "sample_query": "Map the water bodies and coastal perimeter in this Landsat GeoTIFF."
+            },
+            {
+                "filename": "sentinel2_sample.tif",
+                "path": "/test_dataset/geotiff/sentinel2_sample.tif",
+                "sensor": "Sentinel-2 Multispectral GeoTIFF (.tif, 16-bit)",
+                "features": "Copernicus Level-2A surface reflectance",
+                "sample_query": "What is the dominant land cover in this GeoTIFF?"
+            },
+            {
+                "filename": "sentinel2_cloud_optimized_cog.tif",
+                "path": "/test_dataset/geotiff/sentinel2_cloud_optimized_cog.tif",
+                "sensor": "Sentinel-2 Cloud-Optimized GeoTIFF (COG, 16-bit)",
+                "features": "Calibrated surface reflectance, coastal and inland water features",
+                "sample_query": "Detect water channels and delineate boundaries in this COG."
+            },
+            {
+                "filename": "global_earth_observation.tif",
+                "path": "/test_dataset/geotiff/global_earth_observation.tif",
+                "sensor": "Global Earth Observation True-Color GeoTIFF (.tif)",
+                "features": "Continental land masses, global ocean basins, atmospheric cloud bands",
+                "sample_query": "Analyze water vs land percentages across the global footprint."
+            },
+            {
+                "filename": "elevation_shade_terrain.tif",
+                "path": "/test_dataset/geotiff/elevation_shade_terrain.tif",
+                "sensor": "Digital Elevation Model / Shaded Relief GeoTIFF (.tif)",
+                "features": "Topographical ridge lines, valleys, drainage depressions",
+                "sample_query": "Where are the low-elevation drainage basins and shadows located?"
+            },
+            {
+                "filename": "landcover_aerial_orthophoto.tif",
+                "path": "/test_dataset/geotiff/landcover_aerial_orthophoto.tif",
+                "sensor": "LandCover.ai Aerial Orthophoto GeoTIFF (.tif)",
+                "features": "High-resolution civil structures, rooftops, and access roads",
+                "sample_query": "Detect urban buildings and civil infrastructure in this orthophoto."
+            }
+        ],
+        "sar": [
+            {
+                "filename": "sar_sentinel1_dual_polarization.jpg",
+                "path": "/test_dataset/sar/sar_sentinel1_dual_polarization.jpg",
+                "sensor": "Sentinel-1 SAR C-Band Microwave",
+                "features": "Dual-polarization radar backscatter (specular water, double bounce)",
+                "sample_query": "Analyze water boundaries using radar backscatter."
+            },
+            {
+                "filename": "sentinel1_sar_vh.tif",
+                "path": "/test_dataset/sar/sentinel1_sar_vh.tif",
+                "sensor": "Sentinel-1 SAR VH GeoTIFF (.tif)",
+                "features": "Cross-polarization volume scattering radar patch",
+                "sample_query": "Perform radar backscatter and water detection."
+            },
+            {
+                "filename": "sentinel1_sar_vv.tif",
+                "path": "/test_dataset/sar/sentinel1_sar_vv.tif",
+                "sensor": "Sentinel-1 SAR VV GeoTIFF (.tif)",
+                "features": "Co-polarization surface roughness radar patch",
+                "sample_query": "Analyze surface roughness and radar intensity."
+            },
+            {
+                "filename": "sentinel1_sar_hh_polarization.tif",
+                "path": "/test_dataset/sar/sentinel1_sar_hh_polarization.tif",
+                "sensor": "Sentinel-1 SAR HH Polarization GeoTIFF (.tif)",
+                "features": "Horizontal co-polarized microwave backscatter calibrated intensity",
+                "sample_query": "Evaluate radar backscatter intensity and identify low-return water zones."
+            },
+            {
+                "filename": "sentinel1_sar_hv_polarization.tif",
+                "path": "/test_dataset/sar/sentinel1_sar_hv_polarization.tif",
+                "sensor": "Sentinel-1 SAR HV Polarization GeoTIFF (.tif)",
+                "features": "Horizontal-Vertical cross-polarized volume scattering radar patch",
+                "sample_query": "Analyze microwave cross-polarization and surface textures."
+            }
+        ]
+    }
+
+
 @app.post("/api/analyze", response_model=AnalysisResult)
 async def analyze_imagery(
     query: str = Form(..., description="User question or instruction"),
@@ -161,12 +297,39 @@ async def analyze_imagery(
     if len(images) > 2:
         raise HTTPException(status_code=400, detail="Maximum 2 images supported per analysis session.")
 
+    from satquery_core.models.feature_analyzer import DynamicFeatureAnalyzer
+
     saved_paths = []
+    preview_web_paths = []
+
     for img in images:
         file_dest = UPLOAD_DIR / f"{int(time.time()*1000)}_{img.filename}"
         with open(file_dest, "wb") as buffer:
             shutil.copyfileobj(img.file, buffer)
         saved_paths.append(str(file_dest))
+
+        # Check if file is TIFF (by extension or magic bytes)
+        is_tif = file_dest.suffix.lower() in [".tif", ".tiff"]
+        if not is_tif:
+            try:
+                with open(file_dest, "rb") as f_head:
+                    h_bytes = f_head.read(4)
+                    if h_bytes.startswith(b"II*\x00") or h_bytes.startswith(b"MM\x00*"):
+                        is_tif = True
+            except Exception:
+                pass
+
+        if is_tif:
+            preview_name = f"preview_{file_dest.stem}.png"
+            preview_file = UPLOAD_DIR / preview_name
+            try:
+                DynamicFeatureAnalyzer.generate_web_preview(file_dest, preview_file)
+                preview_web_paths.append(f"/uploads/{preview_name}")
+            except Exception as e_prev:
+                print(f"[!] Warning: Could not generate web preview for {file_dest.name}: {e_prev}")
+                preview_web_paths.append(f"/uploads/{file_dest.name}")
+        else:
+            preview_web_paths.append(f"/uploads/{file_dest.name}")
 
     ts_list = [t.strip() for t in timestamps.split(",")] if timestamps else None
 
@@ -180,6 +343,13 @@ async def analyze_imagery(
 
     # Execute agent
     result = agent.run(req)
+
+    # Attach generated web previews for browser display
+    if preview_web_paths:
+        if not result.evidence:
+            result.evidence = VisualEvidence()
+        result.evidence.preview_path = preview_web_paths[0]
+        result.evidence.preview_paths = preview_web_paths
 
     # Normalize mask path to a web accessible URL
     if result.evidence and result.evidence.mask_path:
@@ -209,6 +379,10 @@ def export_report(result: AnalysisResult):
         "status": "Report Generated",
         "paths": paths
     }
+
+
+# Mount Dataminds static files for root-level asset serving (styles.css, hero.js, output.js, satellite_map.jpg)
+app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 
 
 if __name__ == "__main__":

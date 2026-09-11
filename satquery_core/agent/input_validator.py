@@ -46,17 +46,36 @@ class InputValidator:
             try:
                 with Image.open(p) as img:
                     w, h = img.size
-                    meta = {
-                        "image_index": idx + 1,
-                        "filename": p.name,
-                        "width": w,
-                        "height": h,
-                        "format": img.format,
-                        "mode": img.mode
-                    }
-                    image_metadata.append(meta)
-            except Exception as e:
-                return False, f"Cannot open image {p.name}: {str(e)}", []
+                    fmt = img.format
+                    mode = img.mode
+            except Exception as e_pil:
+                # Fallback to tifffile for 16-bit, multi-band, or tiled GeoTIFFs
+                try:
+                    import tifffile
+                    arr = tifffile.imread(str(p))
+                    if arr.ndim == 2:
+                        h, w = arr.shape
+                    elif arr.ndim == 3:
+                        if arr.shape[0] < min(arr.shape[1], arr.shape[2]):
+                            h, w = arr.shape[1], arr.shape[2]
+                        else:
+                            h, w = arr.shape[0], arr.shape[1]
+                    else:
+                        h, w = 512, 512
+                    fmt = "TIFF"
+                    mode = f"{arr.dtype}"
+                except Exception as e_tif:
+                    return False, f"Cannot open image {p.name}: {str(e_pil)} / {str(e_tif)}", []
+
+            meta = {
+                "image_index": idx + 1,
+                "filename": p.name,
+                "width": w,
+                "height": h,
+                "format": fmt,
+                "mode": mode
+            }
+            image_metadata.append(meta)
 
         # 4. Dimension compatibility for paired images
         if len(image_metadata) == 2:

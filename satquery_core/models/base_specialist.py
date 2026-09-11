@@ -16,16 +16,19 @@ class SpecialistOutput:
         answer: str,
         evidence: Optional[VisualEvidence] = None,
         confidence_score: float = 0.85,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
+        plain_language_solution: Optional[str] = None
     ):
         self.answer = answer
         self.evidence = evidence or VisualEvidence()
         self.confidence_score = confidence_score
         self.metadata = metadata or {}
+        self.plain_language_solution = plain_language_solution
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "answer": self.answer,
+            "plain_language_solution": self.plain_language_solution,
             "evidence": self.evidence.model_dump(),
             "confidence_score": self.confidence_score,
             "metadata": self.metadata
