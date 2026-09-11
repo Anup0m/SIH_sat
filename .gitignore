@@ -36,3 +36,4 @@ wandb/
 Thumbs.db
 .vscode/
 .idea/
+*.exe
