@@ -83,6 +83,8 @@ def serve_output_page():
     return FileResponse(FRONTEND_DIR / "output.html")
 
 
+@app.get("/healthz")
+@app.get("/health")
 @app.get("/api/health")
 def health_check():
     """Returns system status, active specialist count, and hardware info."""
